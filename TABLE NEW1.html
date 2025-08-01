@@ -1,0 +1,548 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Time Table Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: rgba(255,255,255,0.92);
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            margin-bottom: 24px;
+        }
+        label {
+            display: block;
+            margin: 12px 0 4px;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        input[type="checkbox"] {
+            width: auto; /* Override full width for checkboxes */
+            margin-right: 8px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        button {
+            background: #41fe12;
+            color: #e81212;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #00fbff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background: #0078d7;
+            color: #fff;
+        }
+
+        .accordion {
+            background-color: #0078d7;
+            color: #fff;
+            cursor: pointer;
+            padding: 14px 20px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1.1em;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+        .accordion:hover, .accordion.active {
+            background-color: #005fa3;
+        }
+        .panel {
+            padding: 0 18px 18px 18px;
+            background-color: rgba(255,255,255,0.95);
+            display: none;
+            overflow: hidden;
+            border-radius: 0 0 8px 8px;
+            margin-bottom: 24px;
+        }
+        .download-button {
+            background: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .download-button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Smart Time Table Generator</h1>
+        <form id="timetableForm">
+            <label for="batchYear">Student Batch Year:</label>
+            <input type="number" id="batchYear" name="batchYear" placeholder="2022-2026" required>
+
+            <label for="currentYear">Current Year:</label>
+            <input type="number" id="currentYear" name="currentYear" min="0" max="5" placeholder="04" required>
+            <label for="college">College Name:</label>
+            <input type="text" id="college" name="college" placeholder="Enter College Name" required>
+
+            <label for="semester">Semester No:</label>
+            <input type="number" id="semester" name="semester" min="1" max="8" placeholder="Enter Semester No" required>
+
+            <label for="mentor">Class Mentor Name(s):</label>
+            <input type="text" id="mentor" name="mentor" placeholder="Mentor names for each class, comma separated" required>
+
+            <label for="course">Department Name:</label>
+            <input type="text" id="course" name="course" required>
+
+            <label for="days">Number of Days:</label>
+            <select id="days" name="days">
+                <option value="3">3 (UPTO WED)</option>
+                <option value="4">4 (UPTO THU)</option>
+                <option value="5">5 (UPTO FRI)</option>
+                <option value="6">6 (UPTO SAT)</option>
+            </select>
+
+            <label for="periods">Periods per Day:</label>
+            <input type="number" id="periods" name="periods" min="1" max="9" value="6" required>
+
+            <label for="tclSubjects">TCL Subjects (comma separated):</label>
+            <input type="text" id="tclSubjects" name="tclSubjects" placeholder="e.g. TCL Subject 1, TCL Subject 2" required>
+
+            <label for="tclSubjectsPeriods">No. of Periods per Week for each TCL Subject (comma separated, in order):</label>
+            <input type="text" id="tclSubjectsPeriods" name="tclSubjectsPeriods" placeholder="e.g. 3, 2" required>
+
+            <label for="tclSubjectsStaff">Staff Name for each TCL Subject (comma separated, in order):</label>
+            <input type="text" id="tclSubjectsStaff" name="tclSubjectsStaff" placeholder="e.g. Staff A, Staff B" required>
+
+            <label for="tclLabs">TCL Labs (comma separated):</label>
+            <input type="text" id="tclLabs" name="tclLabs" placeholder="e.g. TCL Lab 1, TCL Lab 2">
+
+            <label for="tclLabsPeriods">No. of Labs per Week for each TCL Lab (comma separated, in order):</label>
+            <input type="text" id="tclLabsPeriods" name="tclLabsPeriods" placeholder="e.g. 1, 1">
+
+            <label for="tclLabsStaff">Staff Name for each TCL Lab (comma separated, in order):</label>
+            <input type="text" id="tclLabsStaff" name="tclLabsStaff" placeholder="e.g. Staff C, Staff D">
+
+            <label for="coreSubjects">Core Subjects (comma separated):</label>
+            <input type="text" id="coreSubjects" name="coreSubjects" placeholder="e.g. Core Subject 1, Core Subject 2" required>
+
+            <label for="coreSubjectsPeriods">No. of Periods per Week for each Core Subject (comma separated, in order):</label>
+            <input type="text" id="coreSubjectsPeriods" name="coreSubjectsPeriods" placeholder="e.g. 4, 3" required>
+
+            <label for="coreSubjectsStaff">Staff Name for each Core Subject (comma separated, in order):</label>
+            <input type="text" id="coreSubjectsStaff" name="coreSubjectsStaff" placeholder="e.g. Staff E, Staff F" required>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="includePE" name="includePE">
+                <label for="includePE" style="margin: 0;">Include Physical Education Period (1 per weekend)</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="includeLibrary" name="includeLibrary">
+                <label for="includeLibrary" style="margin: 0;">Include Library Period (1 per weekend)</label>
+            </div>
+
+            <label for="numTables" style="margin-top:12px;">Number of Tables to Generate:</label>
+            <input type="number" id="numTables" name="numTables" min="1" max="5" value="1" style="margin-bottom:12px;" required>
+            <center>
+                <button type="button" onclick="generateBothTimetables()">Generate</button>
+            </center>
+        </form>
+        <button class="accordion" type="button" onclick="toggleAccordion('panel1')">Class A Timetable</button>
+        <div class="panel" id="panel1" style="display:none;">
+            <div id="timetableResult1"></div>
+        </div>
+        <button class="accordion" type="button" onclick="toggleAccordion('panel2')">Class B Timetable</button>
+        <div class="panel" id="panel2" style="display:none;">
+            <div id="timetableResult2"></div>
+        </div>
+        <button class="accordion" type="button" onclick="toggleAccordion('panel3')">Class C Timetable</button>
+        <div class="panel" id="panel3" style="display:none;">
+            <div id="timetableResult3"></div>
+        </div>
+        <button class="accordion" type="button" onclick="toggleAccordion('panel4')">Class D Timetable</button>
+        <div class="panel" id="panel4" style="display:none;">
+            <div id="timetableResult4"></div>
+        </div>
+        <button class="accordion" type="button" onclick="toggleAccordion('panel5')">Class E Timetable</button>
+        <div class="panel" id="panel5" style="display:none;">
+            <div id="timetableResult5"></div>
+        </div>
+
+        <button type="button" class="download-button" onclick="downloadTimetables()">Download All Timetables</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script>
+        function toggleAccordion(panelId) {
+            var panel = document.getElementById(panelId);
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+            } else {
+                panel.style.display = 'block';
+            }
+        }
+
+        function generateBothTimetables() {
+            const batchYear = document.getElementById('batchYear').value.trim();
+            const currentYear = document.getElementById('currentYear').value.trim();
+            const college = document.getElementById('college').value.trim();
+            const semester = document.getElementById('semester').value.trim();
+            const mentorInput = document.getElementById('mentor').value.trim();
+            const mentorNames = mentorInput.split(',').map(s => s.trim()).filter(Boolean);
+            const days = parseInt(document.getElementById('days').value);
+            const periods = parseInt(document.getElementById('periods').value);
+
+            const includePE = document.getElementById('includePE').checked;
+            const includeLibrary = document.getElementById('includeLibrary').checked;
+
+            // Get all inputs
+            const tclSubjects = document.getElementById('tclSubjects').value.split(',').map(s => s.trim()).filter(Boolean);
+            const tclSubjectsPeriods = document.getElementById('tclSubjectsPeriods').value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+            const tclSubjectsStaff = document.getElementById('tclSubjectsStaff').value.split(',').map(s => s.trim()).filter(Boolean);
+            const tclLabs = document.getElementById('tclLabs').value.split(',').map(s => s.trim()).filter(Boolean);
+            const tclLabsPeriods = document.getElementById('tclLabsPeriods').value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+            const tclLabsStaff = document.getElementById('tclLabsStaff').value.split(',').map(s => s.trim()).filter(Boolean);
+            const coreSubjects = document.getElementById('coreSubjects').value.split(',').map(s => s.trim()).filter(Boolean);
+            const coreSubjectsPeriods = document.getElementById('coreSubjectsPeriods').value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+            const coreSubjectsStaff = document.getElementById('coreSubjectsStaff').value.split(',').map(s => s.trim()).filter(Boolean);
+
+            const dayNames = days === 5 ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            // Get number of tables to generate from text box
+            const numClasses = parseInt(document.getElementById('numTables').value);
+
+            // Define period time slots for 9AM-4PM, 45min each, with breaks
+            // Periods: 1 (9:00-9:45), 2 (9:45-10:30), 3 (10:30-11:15), Break (11:15-11:30), 4 (11:30-12:15), 5 (12:15-1:00), Lunch (1:00-1:45), 6 (1:45-2:30), 7 (2:30-3:15), 8 (3:15-4:00)
+            // Only show as many periods as selected, but always show break/lunch at correct slots
+            const periodSlots = [
+                { label: 'Period 1', time: '9:00 - 9:45' },
+                { label: 'Period 2', time: '9:45 - 10:30' },
+                { label: 'Period 3', time: '10:30 - 11:15' },
+                { label: 'Break', time: '11:15 - 11:30', isBreak: true },
+                { label: 'Period 4', time: '11:30 - 12:15' },
+                { label: 'Period 5', time: '12:15 - 1:00' },
+                { label: 'Lunch', time: '1:00 - 1:45', isLunch: true },
+                { label: 'Period 6', time: '1:45 - 2:30' },
+                { label: 'Period 7', time: '2:30 - 3:15' },
+                { label: 'Period 8', time: '3:15 - 4:00' }
+            ];
+
+            // Calculate which slots to show based on periods per day
+            // Always include break after 3rd period and lunch after 5th period
+            function getSlots(periods) {
+                let slots = [];
+                let count = 0;
+                for (let i = 0; i < periodSlots.length; i++) {
+                    if (periodSlots[i].isBreak && count >= 3) {
+                        slots.push(periodSlots[i]);
+                    } else if (periodSlots[i].isLunch && count >= 5) {
+                        slots.push(periodSlots[i]);
+                    } else if (!periodSlots[i].isBreak && !periodSlots[i].isLunch && count < periods) {
+                        slots.push(periodSlots[i]);
+                        count++;
+                    }
+                }
+                return slots;
+            }
+
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            function generateTimetable(days, periods, mentorName) {
+                let slots = getSlots(periods);
+                let timetable = Array.from({ length: days }, () => Array(slots.length).fill(null));
+
+                // Build subject pool
+                let subjectPool = [];
+                tclSubjects.forEach((subj, i) => {
+                    for (let j = 0; j < (tclSubjectsPeriods[i] || 0); j++) {
+                        subjectPool.push({ type: 'TCL', name: subj, staff: tclSubjectsStaff[i] || '' });
+                    }
+                });
+                coreSubjects.forEach((subj, i) => {
+                    for (let j = 0; j < (coreSubjectsPeriods[i] || 0); j++) {
+                        subjectPool.push({ type: 'Core', name: subj, staff: coreSubjectsStaff[i] || '' });
+                    }
+                });
+
+                // Labs: each lab scheduled for 3 consecutive periods per week after lunch
+                let labPool = [];
+                tclLabs.forEach((lab, i) => {
+                    for (let j = 0; j < (tclLabsPeriods[i] || 0); j++) {
+                        labPool.push({ type: 'TCL Lab', name: lab, staff: tclLabsStaff[i] || '' });
+                    }
+                });
+
+                // Place labs: 3 consecutive periods after lunch, random day for each lab
+                let usedLabDays = new Set();
+                labPool.forEach(lab => {
+                    let availableDays = Array.from({length: days}, (_, d) => d).filter(d => !usedLabDays.has(d));
+                    if (availableDays.length === 0) availableDays = Array.from({length: days}, (_, d) => d); // Reset if all days used
+                    let day = shuffle(availableDays)[0];
+                    usedLabDays.add(day);
+
+                    // Find lunch slot
+                    let lunchIdx = slots.findIndex(s => s.isLunch);
+                    let startIdx = lunchIdx + 1; // Start after lunch
+
+                    // Ensure there's enough space for 3 periods
+                    if (startIdx + 2 >= slots.length) {
+                        startIdx = Math.max(0, slots.length - 3);
+                    }
+
+                    for (let k = 0; k < 3; k++) {
+                        timetable[day][startIdx + k] = { ...lab, isLab: true, isLabCont: k > 0, mentor: mentorName };
+                    }
+                });
+
+                // Place special periods on the last day of the week, after break or lunch
+                const lastDayIndex = days - 1;
+                let specialPeriodsToPlace = [];
+                if (includePE) {
+                    specialPeriodsToPlace.push({ name: 'Physical Education', staff: 'PE Staff', isSpecial: true });
+                }
+                if (includeLibrary) {
+                    specialPeriodsToPlace.push({ name: 'Library', staff: 'Librarian', isSpecial: true });
+                }
+
+                shuffle(specialPeriodsToPlace); // Randomize order of special periods
+
+                let specialPeriodsPlacedCount = 0;
+                for (let p = 0; p < slots.length; p++) {
+                    if (specialPeriodsPlacedCount < specialPeriodsToPlace.length) {
+                        // Check if the slot is after a break or lunch, and is not already filled
+                        if ((slots[p].isBreak || slots[p].isLunch) && p + 1 < slots.length && !timetable[lastDayIndex][p + 1]) {
+                            timetable[lastDayIndex][p + 1] = specialPeriodsToPlace[specialPeriodsPlacedCount];
+                            specialPeriodsPlacedCount++;
+                            p++; // Skip the next slot as it's now filled
+                        } else if (!slots[p].isBreak && !slots[p].isLunch && !timetable[lastDayIndex][p]) {
+                            // If no break/lunch before, try to place it in an empty slot
+                            // This part needs careful consideration to ensure it's "after" a break/lunch
+                            // For simplicity, let's prioritize placing after a break/lunch.
+                            // If no such slot is found, it will be placed in the general pool later.
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                // If special periods couldn't be placed after a break/lunch on the last day,
+                // or if there are remaining special periods, add them to the general subject pool
+                // to be placed randomly.
+                for (let i = specialPeriodsPlacedCount; i < specialPeriodsToPlace.length; i++) {
+                    subjectPool.push(specialPeriodsToPlace[i]);
+                }
+
+
+                // Fill remaining slots with subjects
+                let subjectPoolCopy = [...subjectPool];
+                for (let d = 0; d < days; d++) {
+                    let prevSubject = null;
+                    for (let p = 0; p < slots.length; p++) {
+                        if (slots[p].isBreak) {
+                            timetable[d][p] = { name: 'Break', isBreak: true };
+                            continue;
+                        }
+                        if (slots[p].isLunch) {
+                            timetable[d][p] = { name: 'Lunch', isLunch: true };
+                            continue;
+                        }
+                        if (timetable[d][p]) continue; // Already filled by lab or special period
+
+                        // Pick a subject not same as previous
+                        let choices = subjectPoolCopy.filter(s => s.name !== prevSubject);
+                        if (choices.length === 0) choices = subjectPoolCopy; // If no different subject, reuse
+                        if (choices.length === 0) continue; // No subjects left
+
+                        let pickIdx = Math.floor(Math.random() * choices.length);
+                        let pick = choices[pickIdx];
+                        timetable[d][p] = pick;
+                        // Remove the picked subject from the pool to ensure distribution
+                        const index = subjectPoolCopy.indexOf(pick);
+                        if (index > -1) {
+                            subjectPoolCopy.splice(index, 1);
+                        }
+                        prevSubject = pick.name;
+                    }
+                }
+                return timetable;
+            }
+
+            let timetables = [];
+            for (let c = 0; c < numClasses; c++) {
+                timetables.push(generateTimetable(days, periods, mentorNames[c] || ''));
+            }
+
+            function renderTable(timetable, dayNames, mentorName, periods, days, college, semester, batchYear, currentYear, department) {
+                let slots = getSlots(periods);
+                let html = `<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+                    <span style='font-size:1.1em;font-weight:bold;'>Department: ${department}</span>
+                    <span style='display:flex;flex-direction:column;align-items:flex-end;'>
+                        <span style='font-size:1.1em;font-weight:bold;'>Batch Year: ${batchYear}</span>
+                        <span style='font-size:1em;font-weight:normal;'>Current Year: ${currentYear}</span>
+                    </span>
+                </div>`;
+                html += `<div style=\"margin-bottom:4px;font-size:1.1em;font-weight:bold;\">${college ? college + ' - ' : ''}Semester ${semester}</div>`;
+                html += `<div style=\"margin-bottom:8px;font-weight:bold;\">Class Mentor: ${mentorName}</div>`;
+                html += '<table style="position:relative;width:100%">';
+                html += '<tr>';
+                html += '<th style="text-align:left;">Day</th>';
+                for (let i = 0; i < slots.length; i++) {
+                    if (slots[i].isBreak) {
+                        html += `<th style='background:#ffe082;color:#333;'>Break<br><span style='font-size:0.9em;'>${slots[i].time}</span></th>`;
+                    } else if (slots[i].isLunch) {
+                        html += `<th style='background:#ffb300;color:#333;'>Lunch<br><span style='font-size:0.9em;'>${slots[i].time}</span></th>`;
+                    } else {
+                        html += `<th>${slots[i].label}<br><span style='font-size:0.9em;'>${slots[i].time}</span></th>`;
+                    }
+                }
+                html += '</tr>';
+                for (let d = 0; d < days; d++) {
+                    html += `<tr><td>${dayNames[d]}</td>`;
+                    for (let p = 0; p < slots.length; p++) {
+                        let cell = timetable[d][p];
+                        if (cell === null) { // Handle unassigned slots
+                            html += `<td></td>`;
+                        } else if (cell.isBreak) {
+                            html += `<td style='background:#ffe082;color:#333;'>Break</td>`;
+                        } else if (cell.isLunch) {
+                            html += `<td style='background:#ffb300;color:#333;'>Lunch</td>`;
+                        } else if (cell.isLab) {
+                            if (cell.isLabCont) {
+                                html += `<td style='background:#c5e1a5;color:#333;'>Lab (Cont.)</td>`;
+                            } else {
+                                html += `<td style='background:#8bc34a;color:#fff;'>${cell.name} - ${cell.staff}<br><span style='font-size:0.95em;color:#fff;'>Mentor: ${cell.mentor}</span></td>`;
+                            }
+                        } else if (cell.isSpecial) {
+                            html += `<td style='background:#add8e6;color:#333;'>${cell.name} - ${cell.staff}</td>`; // Light blue for special periods
+                        }
+                        else {
+                            html += `<td>${cell.name} - ${cell.staff}</td>`;
+                        }
+                    }
+                    html += '</tr>';
+                }
+                html += '</table>';
+                return html;
+            }
+
+            const department = document.getElementById('course').value.trim();
+            for (let c = 0; c < numClasses; c++) {
+                document.getElementById('timetableResult' + (c + 1)).innerHTML = renderTable(
+                    timetables[c],
+                    dayNames,
+                    mentorNames[c] || '',
+                    periods,
+                    days,
+                    college,
+                    semester,
+                    batchYear,
+                    currentYear,
+                    department
+                );
+            }
+        }
+
+        function downloadTimetables() {
+            const numClasses = parseInt(document.getElementById('numTables').value);
+            let content = '';
+
+            // Add general information at the top
+            const college = document.getElementById('college').value.trim();
+            const department = document.getElementById('course').value.trim();
+            const batchYear = document.getElementById('batchYear').value.trim();
+            const currentYear = document.getElementById('currentYear').value.trim();
+            const semester = document.getElementById('semester').value.trim();
+
+            content += `<h1>${college} - Department of ${department}</h1>`;
+            content += `<h2>Batch Year: ${batchYear} | Current Year: ${currentYear} | Semester: ${semester}</h2>`;
+            content += `<hr>`;
+
+            for (let c = 0; c < numClasses; c++) {
+                const panelId = 'panel' + (c + 1);
+                const timetableResultId = 'timetableResult' + (c + 1);
+                const panelElement = document.getElementById(panelId);
+                const timetableResultElement = document.getElementById(timetableResultId);
+
+                if (timetableResultElement && timetableResultElement.innerHTML.trim() !== '') {
+                    // Temporarily make the panel visible to ensure content is rendered for PDF
+                    const originalDisplay = panelElement.style.display;
+                    panelElement.style.display = 'block';
+
+                    content += `<h2>Class ${String.fromCharCode(65 + c)} Timetable</h2>`;
+                    content += timetableResultElement.innerHTML;
+                    content += `<div style="page-break-after: always;"></div>`; // Page break for each timetable
+
+                    // Restore original display
+                    panelElement.style.display = originalDisplay;
+                }
+            }
+
+            if (content.trim() === '') {
+                alert('Please generate timetables first.');
+                return;
+            }
+
+            const opt = {
+                margin:       0.5,
+                filename:     `Timetables_${college}_${department}_Sem${semester}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(content).save();
+        }
+    </script>
+</body>
+</html>
+```
